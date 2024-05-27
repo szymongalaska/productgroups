@@ -25,3 +25,13 @@
 * Don't forget to prefix your containers with your own identifier
 * to avoid any conflicts with others containers.
 */
+
+$(function(){
+    if($('form#product_groups_product_form').length > 0){
+            $('select#product_select').select2({
+                minimumInputLength: 3,
+                width: '50%', 
+                multiple: true,
+            });
+    }
+});

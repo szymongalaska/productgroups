@@ -25,10 +25,24 @@
 */
 $sql = array();
 
-$sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'productgroups` (
-    `id_productgroups` int(11) NOT NULL AUTO_INCREMENT,
-    PRIMARY KEY  (`id_productgroups`)
+$sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'product_groups` (
+    `id_product_groups` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(50),
+    `active` BOOLEAN NOT NULL,
+    PRIMARY KEY  (`id_product_groups`)
 ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
+
+$sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'product_groups_product` (
+    `id_product_groups_product` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,   
+    `id_product_groups` int(11) UNSIGNED NOT NULL,
+    `id_product` int(11) UNSIGNED NOT NULL,
+    `position` int(11) NOT NULL DEFAULT "0" ,
+    PRIMARY KEY (`id_product_groups_product`),
+    INDEX (`position`),
+    UNIQUE (`id_product_groups`, `id_product`),
+    FOREIGN KEY (`id_product_groups`) REFERENCES `' . _DB_PREFIX_ . 'product_groups` (`id_product_groups`),
+    FOREIGN KEY (`id_product`) REFERENCES `' . _DB_PREFIX_ . 'product` (`id_product`)
+    ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
 
 foreach ($sql as $query) {
     if (Db::getInstance()->execute($query) == false) {
