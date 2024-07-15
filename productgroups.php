@@ -48,9 +48,9 @@ class Productgroups extends Module
 
         return parent::install() &&
             $this->registerHook('header') &&
-            $this->registerHook('displayProductAdditionalInfo') &&
+            // $this->registerHook('displayProductAdditionalInfo') &&
             $this->registerHook('actionProductDelete') &&
-            // $this->registerHook('displayProductBeforeVariants') &&
+            $this->registerHook('displayProductBeforeVariants') &&
             $this->registerHook('displayBackOfficeHeader') &&
             $this->installTab();
     }
@@ -125,13 +125,26 @@ class Productgroups extends Module
      */
     public function hookActionProductDelete($params)
     {
-        $sql = 'DELETE FROM `'._DB_PREFIX_.'product_groups_product` pgp WHERE `id_product` = '.$params['id_product'];
+        $query = new DbQuery;
 
-        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+        $query->select('pgp.`id_product_groups_product`');
+        $query->from('product_groups_product', 'pgp');
+        $query->where('`id_product` = '.$params['id_product']);
+
+        $ids = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query->build());
+
+        if(count($ids) <= 0)
+            return false;
+
+        foreach($ids as $id)
+        {
+            $obj = new ProductGroupProduct($id['id_product_groups_product']);
+            $obj->delete();
+        }
     }   
 
-    public function hookDisplayProductAdditionalInfo($params)
-    // public function hookDisplayProductBeforeVariants($params)
+    // public function hookDisplayProductAdditionalInfo($params)
+    public function hookDisplayProductBeforeVariants($params)
     {
         if (!$id_product_groups = $this->getGroups($params['product']['id_product'], true))
             return false;
