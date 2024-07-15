@@ -49,6 +49,7 @@ class Productgroups extends Module
         return parent::install() &&
             $this->registerHook('header') &&
             $this->registerHook('displayProductAdditionalInfo') &&
+            $this->registerHook('actionProductDelete') &&
             // $this->registerHook('displayProductBeforeVariants') &&
             $this->registerHook('displayBackOfficeHeader') &&
             $this->installTab();
@@ -116,6 +117,18 @@ class Productgroups extends Module
     {
         $this->context->controller->addJS($this->_path . '/views/js/back.js');
     }
+
+    /**
+     * Deletes products from groups when product is deleted
+     * @param mixed $params
+     * @return mixed
+     */
+    public function hookActionProductDelete($params)
+    {
+        $sql = 'DELETE FROM `'._DB_PREFIX_.'product_groups_product` pgp WHERE `id_product` = '.$params['id_product'];
+
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+    }   
 
     public function hookDisplayProductAdditionalInfo($params)
     // public function hookDisplayProductBeforeVariants($params)
